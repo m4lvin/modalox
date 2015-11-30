@@ -67,6 +67,7 @@ bar2 =
     ) .->. 
       box alice (a .&. b)
 
+muddy :: Form [Char] [Char]
 muddy =
    ( box common ( (a .|. b .|. c)
               .&. whether alice   b
@@ -80,6 +81,41 @@ muddy =
                 )
    ) .->.
      box alice a
+
+nMuddy :: Int -> Form [Char] [Char]
+nMuddy n =
+  let
+    atom    = (Atom).show
+    atoms   = map atom [1..n]
+    agent k = ("Agent" ++ show k) :@ [Reflexive,Transitive]
+    agents  = map agent [1..n]
+    nGroup  = foldl1 (:&&:) agents
+    nCommon = Star nGroup
+    seeOthers k = foldl1 (.&.) [ whether (agent k) (atom j) | j<-[1..n], j /= k ]
+    dontKnowSelf k = nt (box (agent k) (atom k))
+  in
+   ( box nCommon ( ( foldl1 (.|.) atoms )
+              .&. (foldl1 (.&.) (map seeOthers [1..n]))
+              .&. (foldl1 (.&.) (map dontKnowSelf [2..n]))
+                )
+   ) .->.
+     box (agent 1) (atom 1)
+
+{-
+  n | seconds
+----|---------
+  3 |    0.03
+  4 |    0.03
+  5 |    0.05
+  6 |    0.11
+  7 |    0.23
+  8 |    0.55
+  9 |    1.41
+ 10 |    3.88
+ 11 |   12.25
+ 12 |   22.97
+ 13 |   75.03
+-}
 
 bad =
   box common a .->. box common a -- crashes
