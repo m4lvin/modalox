@@ -1,0 +1,8 @@
+resolver: lts-3.11
+packages:
+- '.'
+- location:
+    git: git@github.com:koengit/satplus
+    commit: b0b19e53b85e9db3516606691cbd4b9a6b12c833
+extra-deps:
+- minisat-0.1.2

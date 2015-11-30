@@ -19,7 +19,7 @@ module Modalox
 import Data.List( sort, group, intercalate )
 import qualified Data.Set as S
 import qualified Data.Map as M
-import Control.Monad( when )
+import Control.Monad( when, ap )
 import Data.IORef
 
 import SAT
@@ -98,6 +98,10 @@ newtype M m a =
 instance Functor (M m) where
   f `fmap` M m =
     M (\s say ref -> (\(x,boxs,dias) -> (f x, boxs, dias)) `fmap` m s say ref)
+
+instance Applicative (M m) where
+  pure  = return
+  (<*>) = ap
 
 instance Monad (M m) where
   return x =
